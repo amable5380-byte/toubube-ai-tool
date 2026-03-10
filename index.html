@@ -1,90 +1,197 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>로또 번호 자동 추천기</title>
-    <link rel="stylesheet" href="lotto.css">
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KyungHo Voice To-Do</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.10.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.10.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message" class="lotto-container">
-      <h2>로또 번호 자동 추천기</h2>
-      <div id="lotto-numbers"></div>
-      <button id="generate-lotto" onclick="displayLottoNumbers()">로또 번호 생성</button>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
-
-    <script src="lotto.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        :root {
+            --kh-blue: #003399;
+            --kh-accent: #ff4d4f;
+            --bg-light: #f4f7fa;
         }
-      });
-    </script>
-  </body>
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-light);
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+            margin: 0;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 450px;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 51, 153, 0.1);
+            border-top: 8px solid var(--kh-blue);
+        }
+
+        h2 { text-align: center; color: var(--kh-blue); font-weight: 800; margin-bottom: 2rem; }
+
+        .input-group { display: flex; gap: 8px; margin-bottom: 2rem; position: relative; }
+        
+        input {
+            flex: 1;
+            padding: 14px 45px 14px 14px; /* 마이크 아이콘 자리를 위해 오른쪽 패딩 확보 */
+            border: 2px solid #e5e8eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        /* 마이크 버튼 스타일 */
+        .mic-btn {
+            position: absolute;
+            right: 80px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #adb5bd;
+            transition: 0.2s;
+        }
+        .mic-btn.recording { color: var(--kh-accent); animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .add-btn {
+            padding: 0 20px;
+            background: var(--kh-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        ul { list-style: none; padding: 0; }
+        li {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f2f4f6;
+        }
+
+        .star-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-right: 10px; color: #ccc; }
+        .star-btn.active { color: #ffcc00; }
+        .todo-content { flex: 1; cursor: pointer; font-weight: 500; }
+        .completed { text-decoration: line-through; color: #adb5bd; }
+        .del-btn { color: #ff4d4f; background: none; border: none; cursor: pointer; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>KYUNGHO VOICE TODO</h2>
+    <div class="input-group">
+        <input type="text" id="todoInput" placeholder="말씀하시거나 입력하세요...">
+        <button id="micBtn" class="mic-btn" onclick="startVoice()">🎙️</button>
+        <button class="add-btn" onclick="addTodo()">등록</button>
+    </div>
+    <ul id="todoList"></ul>
+</div>
+
+<script>
+    const input = document.getElementById('todoInput');
+    const micBtn = document.getElementById('micBtn');
+    const list = document.getElementById('todoList');
+    let todos = JSON.parse(localStorage.getItem('khTodos')) || [];
+
+    // 음성 인식 설정 (Web Speech API)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ko-KR';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => { micBtn.classList.add('recording'); };
+        recognition.onend = () => { micBtn.classList.remove('recording'); };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            input.value = transcript;
+            setTimeout(addTodo, 500); // 인식이 끝나면 0.5초 뒤 자동 등록
+        };
+    }
+
+    function startVoice() {
+        if (!recognition) {
+            alert("이 브라우저는 음성 인식을 지원하지 않습니다. 크롬(Chrome)을 권장합니다.");
+            return;
+        }
+        recognition.start();
+    }
+
+    function render() {
+        list.innerHTML = '';
+        const sortedTodos = [...todos].sort((a, b) => b.star - a.star);
+
+        sortedTodos.forEach((todo) => {
+            const index = todos.indexOf(todo);
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <button class="star-btn ${todo.star ? 'active' : ''}" onclick="toggleStar(${index})">
+                    ${todo.star ? '★' : '☆'}
+                </button>
+                <span class="todo-content ${todo.done ? 'completed' : ''}" onclick="toggleDone(${index})">
+                    ${todo.text}
+                </span>
+                <button class="del-btn" onclick="remove(${index})">삭제</button>
+            `;
+            list.appendChild(li);
+        });
+        localStorage.setItem('khTodos', JSON.stringify(todos));
+    }
+
+    function addTodo() {
+        if (!input.value.trim()) return;
+        todos.push({ text: input.value, done: false, star: false });
+        input.value = '';
+        render();
+    }
+
+    function toggleDone(index) {
+        todos[index].done = !todos[index].done;
+        if (todos[index].done) {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#003399', '#ffffff', '#ffcc00']
+            });
+        }
+        render();
+    }
+
+    function toggleStar(index) {
+        todos[index].star = !todos[index].star;
+        render();
+    }
+
+    function remove(index) {
+        todos.splice(index, 1);
+        render();
+    }
+
+    input.addEventListener('keypress', (e) => { if(e.key === 'Enter') addTodo(); });
+    render();
+</script>
+
+</body>
 </html>
